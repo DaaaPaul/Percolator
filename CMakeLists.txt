@@ -6,7 +6,7 @@ project(Percolator)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CXX_STANDARD_REQUIRED ON)
-set(CMAKE_TOOLCHAIN_FILE C:/Users/paulp/vcpkg/scripts/buildsystems/vcpkg.cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 
 find_package(Vulkan REQUIRED)
 find_package(GLFW3 REQUIRED)
@@ -18,13 +18,17 @@ endif()
 
 add_executable(Percolator)
 
-set(SOURCE_FILES
+set(PERCOLATOR_SOURCE
     Source/main.cpp
+
+	CMake/FindGLFW3.cmake
+
+	.gitignore
 )
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${PERCOLATOR_SOURCE})
 
 target_sources(Percolator PRIVATE 
-    ${SOURCE_FILES}
+    ${PERCOLATOR_SOURCE}
 )
 target_link_libraries(Percolator PRIVATE
     ${GLFW3_LIBRARY}
