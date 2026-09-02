@@ -6,7 +6,7 @@ project(Percolator)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CXX_STANDARD_REQUIRED ON)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+set(CMAKE_MODULE_PATH CMake)
 
 find_package(Vulkan REQUIRED)
 find_package(GLFW3 REQUIRED)
@@ -20,6 +20,12 @@ add_executable(Percolator)
 
 set(PERCOLATOR_SOURCE
     Source/main.cpp
+
+	Source/Vulkan/Managers/VulkanInstanceManager.cpp
+	Source/Vulkan/Managers/VulkanInstanceManager.h
+
+	Source/Utility/GeneralUtil.h
+	Source/Utility/VulkanUtil.h
 
 	CMake/FindGLFW3.cmake
 
