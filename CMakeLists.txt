@@ -23,6 +23,11 @@ set(PERCOLATOR_SOURCE
 
 	Source/Vulkan/Managers/VulkanInstanceManager.cpp
 	Source/Vulkan/Managers/VulkanInstanceManager.h
+	Source/Vulkan/Managers/VulkanSurfaceManager.cpp
+	Source/Vulkan/Managers/VulkanSurfaceManager.h
+
+	Source/Glfw/Managers/GlfwWindowManager.cpp
+	Source/Glfw/Managers/GlfwWindowManager.h
 
 	Source/Utility/GeneralUtil.h
 	Source/Utility/VulkanUtil.h
