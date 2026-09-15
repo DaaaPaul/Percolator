@@ -34,7 +34,7 @@ namespace VulkanInstanceManager {
 			}
 		}
 
-		std::vector<const char*> instanceExtensions;
+		std::vector<const char*> instanceExtensions{ VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
 
 		{
 			glfwInit();
@@ -61,12 +61,19 @@ namespace VulkanInstanceManager {
 			std::vector<VkExtensionProperties> extensions(count);
 			vkEnumerateInstanceExtensionProperties(nullptr, &count, extensions.data());
 
+			bool foundThis = false;
+
 			for(int i = 0; i < instanceExtensions.size(); ++i) {
+				bool foundThis = false;
+
 				for(int j = 0; j < extensions.size(); ++j) {
 					if(strcmp(instanceExtensions[i], extensions[j].extensionName) == 0) {
+						foundThis = true;
 						break;
 					}
+				}
 
+				if(!foundThis) {
 					foundAll = false;
 					break;
 				}
@@ -121,9 +128,9 @@ namespace VulkanInstanceManager {
 	}
 
 	void Clean() {
-		vkDestroyInstance(gInstance, nullptr);
-
 		auto vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(gInstance, "vkDestroyDebugUtilsMessengerEXT"));
 		vkDestroyDebugUtilsMessengerEXT(gInstance, gDebugMessenger, nullptr);
+
+		vkDestroyInstance(gInstance, nullptr);
 	}
 }
