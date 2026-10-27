@@ -1,14 +1,14 @@
+#include <vulkan/vulkan.hpp>
 #include "VulkanPhysicalDeviceManager.h"
 #include "VulkanInstanceManager.h"
 #include "Utility/CommonInclude.h"
-#include <vulkan/vulkan.hpp>
 
 namespace VulkanPhysicalDeviceManager {
 	VkPhysicalDevice gPhysicalDevice = VK_NULL_HANDLE;
 	VkPhysicalDeviceLimits gPhysicalDeviceLimits{};
 	uint32_t gGraphicsQueueFamilyIndex = UINT32_MAX;
 
-	void Init(const std::vector<const char*>* pREQUIRED_EXTENSIONS) {
+	void Init() {
 		uint32_t physicalDeviceCount{};
 		VK_CHECK(vkEnumeratePhysicalDevices(VulkanInstanceManager::gInstance, &physicalDeviceCount, nullptr), "VulkanPhysicalDeviceManager::Init: failed to enumerate physical devices");
 		std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
@@ -34,9 +34,21 @@ namespace VulkanPhysicalDeviceManager {
 			std::vector<VkExtensionProperties> extensions(extensionsCount);
 			vkEnumerateDeviceExtensionProperties(option, nullptr, &extensionsCount, extensions.data());
 
-			bool foundAll = true;
+			bool foundAllExtensions = true;
 
-			for(const char* requiredExtension : *pREQUIRED_EXTENSIONS) {
+			std::vector<const char*> requiredExtensions{
+				VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+				VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+				VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+				VK_EXT_HOST_IMAGE_COPY_EXTENSION_NAME,
+				VK_KHR_UNIFIED_IMAGE_LAYOUTS_EXTENSION_NAME,
+				VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+				#ifdef __APPLE__
+				VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME
+				#endif
+			};
+
+			for(const char* requiredExtension : requiredExtensions) {
 				bool foundThis = false;
 
 				for(int i = 0; i < extensions.size(); ++i) {
@@ -47,12 +59,12 @@ namespace VulkanPhysicalDeviceManager {
 				}
 
 				if(!foundThis) {
-					foundAll = false;
+					foundAllExtensions = false;
 					break;
 				}
 			}
 
-			if(!foundAll) {
+			if(!foundAllExtensions) {
 				hasRequiredExtensions = true;
 			}
 
@@ -86,29 +98,46 @@ namespace VulkanPhysicalDeviceManager {
 			std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyCount);
 			vkGetPhysicalDeviceQueueFamilyProperties(option, &queueFamilyCount, queueFamilyProperties.data());
 
-			bool foundAll = false;
+			bool foundAllQueueFamilies = false;
 
 			for(VkQueueFamilyProperties familyProperties : queueFamilyProperties) {
 				if(familyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-					foundAll = true;
+					foundAllQueueFamilies = true;
 					break;
 				}
 			}
 
-			if(!foundAll) {
+			if(!foundAllQueueFamilies) {
 				hasRequiredQueues = true;
 			}
 
 			if(apiVersionEnough && 
-			   hasRequiredExtensions &&
-			   hasRequiredFeatures &&
-			   hasRequiredQueues) {
-				
+			    hasRequiredExtensions &&
+			    hasRequiredFeatures &&
+			    hasRequiredQueues) {
+				gPhysicalDevice = option;
+
+				VkPhysicalDeviceProperties properties{};
+				vkGetPhysicalDeviceProperties(option, &properties);
+
+				gPhysicalDeviceLimits = properties.limits;
+
+				uint32_t queueFamilyCount{};
+				vkGetPhysicalDeviceQueueFamilyProperties(option, &queueFamilyCount, nullptr);
+				std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyCount);
+				vkGetPhysicalDeviceQueueFamilyProperties(option, &queueFamilyCount, queueFamilyProperties.data());
+
+				for(int i = 0; i < queueFamilyProperties.size(); ++i) {
+					if(queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+						gGraphicsQueueFamilyIndex = i;
+						break;
+					}
+				}
 			}
 		}
-	}
 
-	void Clean() {
-		
+		if(gPhysicalDevice == VK_NULL_HANDLE) {
+			assert(false && "Did not find valid physical device");
+		}
 	}
 }
