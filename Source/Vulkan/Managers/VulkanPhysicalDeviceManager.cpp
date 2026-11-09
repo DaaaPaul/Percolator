@@ -14,9 +14,9 @@ namespace VulkanPhysicalDeviceManager {
 
 	void Init() {
 		uint32_t physicalDeviceCount{};
-		VK_CHECK(vkEnumeratePhysicalDevices(VulkanInstanceManager::gInstance, &physicalDeviceCount, nullptr), "VulkanPhysicalDeviceManager::Init: failed to enumerate physical devices");
+		VK_CHECK(vkEnumeratePhysicalDevices(VulkanInstanceManager::gInstance, &physicalDeviceCount, nullptr));
 		std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
-		VK_CHECK(vkEnumeratePhysicalDevices(VulkanInstanceManager::gInstance, &physicalDeviceCount, physicalDevices.data()), "VulkanPhysicalDeviceManager::Init: failed to enumerate physical devices");
+		VK_CHECK(vkEnumeratePhysicalDevices(VulkanInstanceManager::gInstance, &physicalDeviceCount, physicalDevices.data()));
 	
 		for(VkPhysicalDevice option : physicalDevices) {
 			bool apiVersionEnough = false;
@@ -46,10 +46,7 @@ namespace VulkanPhysicalDeviceManager {
 				VK_KHR_SPIRV_1_4_EXTENSION_NAME,
 				VK_EXT_HOST_IMAGE_COPY_EXTENSION_NAME,
 				VK_KHR_UNIFIED_IMAGE_LAYOUTS_EXTENSION_NAME,
-				VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
-				#ifdef __APPLE__
-				VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME
-				#endif
+				VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
 			};
 
 			for(const char* requiredExtension : requiredExtensions) {
@@ -149,8 +146,7 @@ namespace VulkanPhysicalDeviceManager {
 
 	void PrintInfo() {
 		if(gPhysicalDevice == VK_NULL_HANDLE) {
-			std::cout << "Vulkan GPU info: no physical device selected.\n";
-			return;
+			assert(false && "PrintInfo: gPhysicalDevice == VK_NULL_HANDLE");
 		}
 
 		std::ostringstream info;
