@@ -1,5 +1,7 @@
 #include <vulkan/vulkan.hpp>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include "VulkanPhysicalDeviceManager.h"
 #include "VulkanInstanceManager.h"
 #include "Utility/CommonInclude.h"
@@ -135,6 +137,8 @@ namespace VulkanPhysicalDeviceManager {
 				}
 
 				PrintInfo();
+
+				break;
 			}
 		}
 
@@ -144,6 +148,24 @@ namespace VulkanPhysicalDeviceManager {
 	}
 
 	void PrintInfo() {
-		std::cout << 
+		if(gPhysicalDevice == VK_NULL_HANDLE) {
+			std::cout << "Vulkan GPU info: no physical device selected.\n";
+			return;
+		}
+
+		std::ostringstream info;
+		info << std::boolalpha << std::fixed << std::setprecision(2);
+		info << "========== Vulkan GPU ==========\n"
+			 << "Name: " << gPhysicalDeviceProperties.deviceName << '\n'
+			 << "Type: " << vk::to_string(static_cast<vk::PhysicalDeviceType>(gPhysicalDeviceProperties.deviceType)) << '\n'
+			 << "Vendor ID: 0x" << std::hex << gPhysicalDeviceProperties.vendorID
+			 << " | Device ID: 0x" << gPhysicalDeviceProperties.deviceID << std::dec << '\n'
+			 << "Vulkan API: " << VK_API_VERSION_MAJOR(gPhysicalDeviceProperties.apiVersion) << '.'
+			 << VK_API_VERSION_MINOR(gPhysicalDeviceProperties.apiVersion) << '.' << VK_API_VERSION_PATCH(gPhysicalDeviceProperties.apiVersion)
+			 << " (variant " << VK_API_VERSION_VARIANT(gPhysicalDeviceProperties.apiVersion) << ")\n"
+			 // Driver version encoding is vendor-specific.
+			 << "Driver version (raw): 0x" << std::hex << gPhysicalDeviceProperties.driverVersion << std::dec << '\n';
+
+		std::cout << info.str();
 	}
 }
