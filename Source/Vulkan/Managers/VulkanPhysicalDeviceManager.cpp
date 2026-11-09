@@ -1,4 +1,5 @@
 #include <vulkan/vulkan.hpp>
+#include <iostream>
 #include "VulkanPhysicalDeviceManager.h"
 #include "VulkanInstanceManager.h"
 #include "Utility/CommonInclude.h"
@@ -7,6 +8,7 @@ namespace VulkanPhysicalDeviceManager {
 	VkPhysicalDevice gPhysicalDevice = VK_NULL_HANDLE;
 	VkPhysicalDeviceLimits gPhysicalDeviceLimits{};
 	uint32_t gGraphicsQueueFamilyIndex = UINT32_MAX;
+	VkPhysicalDeviceProperties gPhysicalDeviceProperties{};
 
 	void Init() {
 		uint32_t physicalDeviceCount{};
@@ -24,7 +26,7 @@ namespace VulkanPhysicalDeviceManager {
 			VkPhysicalDeviceProperties properties{};
 			vkGetPhysicalDeviceProperties(option, &properties);
 
-			if(properties.apiVersion < VK_API_VERSION_1_3) {
+			if(properties.apiVersion >= VK_API_VERSION_1_3) {
 				apiVersionEnough = true;
 			}
 
@@ -64,31 +66,31 @@ namespace VulkanPhysicalDeviceManager {
 				}
 			}
 
-			if(!foundAllExtensions) {
+			if(foundAllExtensions) {
 				hasRequiredExtensions = true;
 			}
 
 			// features
-			vk::StructureChain<VkPhysicalDeviceFeatures2, 
-							   VkPhysicalDeviceBufferDeviceAddressFeatures, 
-							   VkPhysicalDeviceTimelineSemaphoreFeatures, 
-							   VkPhysicalDeviceSynchronization2Features, 
-							   VkPhysicalDeviceDynamicRenderingFeatures, 
-							   VkPhysicalDeviceExtendedDynamicState2FeaturesEXT,
-							   VkPhysicalDeviceHostImageCopyFeatures,
-							   VkPhysicalDeviceUnifiedImageLayoutsFeaturesKHR> features{};
-			vkGetPhysicalDeviceFeatures2(option, &features.get<VkPhysicalDeviceFeatures2>());
+			vk::StructureChain<vk::PhysicalDeviceFeatures2, 
+							   vk::PhysicalDeviceBufferDeviceAddressFeatures, 
+							   vk::PhysicalDeviceTimelineSemaphoreFeatures, 
+							   vk::PhysicalDeviceSynchronization2Features, 
+							   vk::PhysicalDeviceDynamicRenderingFeatures, 
+							   vk::PhysicalDeviceExtendedDynamicState2FeaturesEXT,
+							   vk::PhysicalDeviceHostImageCopyFeatures,
+							   vk::PhysicalDeviceUnifiedImageLayoutsFeaturesKHR> features{};
+			vkGetPhysicalDeviceFeatures2(option, &*features.get<vk::PhysicalDeviceFeatures2>());
 
-			bool hasAll = features.get<VkPhysicalDeviceFeatures2>().features.samplerAnisotropy && features.get<VkPhysicalDeviceFeatures2>().features.textureCompressionBC &&
-						  features.get<VkPhysicalDeviceBufferDeviceAddressFeatures>().bufferDeviceAddress &&
-						  features.get<VkPhysicalDeviceTimelineSemaphoreFeatures>().timelineSemaphore &&
-						  features.get<VkPhysicalDeviceSynchronization2Features>().synchronization2 &&
-						  features.get<VkPhysicalDeviceDynamicRenderingFeatures>().dynamicRendering &&
-						  features.get<VkPhysicalDeviceExtendedDynamicState2FeaturesEXT>().extendedDynamicState2 &&
-						  features.get<VkPhysicalDeviceHostImageCopyFeaturesEXT>().hostImageCopy &&
-						  features.get<VkPhysicalDeviceUnifiedImageLayoutsFeaturesKHR>().unifiedImageLayouts;
+			bool hasAll = features.get<vk::PhysicalDeviceFeatures2>().features.samplerAnisotropy && features.get<vk::PhysicalDeviceFeatures2>().features.textureCompressionBC &&
+						  features.get<vk::PhysicalDeviceBufferDeviceAddressFeatures>().bufferDeviceAddress &&
+						  features.get<vk::PhysicalDeviceTimelineSemaphoreFeatures>().timelineSemaphore &&
+						  features.get<vk::PhysicalDeviceSynchronization2Features>().synchronization2 &&
+						  features.get<vk::PhysicalDeviceDynamicRenderingFeatures>().dynamicRendering &&
+						  features.get<vk::PhysicalDeviceExtendedDynamicState2FeaturesEXT>().extendedDynamicState2 &&
+						  features.get<vk::PhysicalDeviceHostImageCopyFeaturesEXT>().hostImageCopy &&
+						  features.get<vk::PhysicalDeviceUnifiedImageLayoutsFeaturesKHR>().unifiedImageLayouts;
 
-			if(!hasAll) {
+			if(hasAll) {
 				hasRequiredFeatures = true;
 			}
 			
@@ -107,7 +109,7 @@ namespace VulkanPhysicalDeviceManager {
 				}
 			}
 
-			if(!foundAllQueueFamilies) {
+			if(foundAllQueueFamilies) {
 				hasRequiredQueues = true;
 			}
 
@@ -117,10 +119,8 @@ namespace VulkanPhysicalDeviceManager {
 			    hasRequiredQueues) {
 				gPhysicalDevice = option;
 
-				VkPhysicalDeviceProperties properties{};
-				vkGetPhysicalDeviceProperties(option, &properties);
-
-				gPhysicalDeviceLimits = properties.limits;
+				vkGetPhysicalDeviceProperties(option, &gPhysicalDeviceProperties);
+				gPhysicalDeviceLimits = gPhysicalDeviceProperties.limits;
 
 				uint32_t queueFamilyCount{};
 				vkGetPhysicalDeviceQueueFamilyProperties(option, &queueFamilyCount, nullptr);
@@ -133,11 +133,17 @@ namespace VulkanPhysicalDeviceManager {
 						break;
 					}
 				}
+
+				PrintInfo();
 			}
 		}
 
 		if(gPhysicalDevice == VK_NULL_HANDLE) {
 			assert(false && "Did not find valid physical device");
 		}
+	}
+
+	void PrintInfo() {
+		std::cout << 
 	}
 }
