@@ -17,7 +17,7 @@ namespace GlfwWindowManager {
 	InitCalled Init() {
 		InitGlfwState();
 
-		gGlfwWindow = glfwCreateWindow(800, 600, "Percolator", nullptr, nullptr);
+		gGlfwWindow = glfwCreateWindow(gWINDOW_WIDTH, gWINDOW_HEIGHT, "Percolator", nullptr, nullptr);
 		if(!gGlfwWindow) {
 			assert(false && "glfwCreateWindow returned nullptr");
 		}

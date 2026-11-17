@@ -10,5 +10,4 @@ namespace VulkanPhysicalDeviceManager {
 	extern uint32_t gGraphicsQueueFamilyIndex;
 
 	void Init();
-	void PrintInfo();
 }

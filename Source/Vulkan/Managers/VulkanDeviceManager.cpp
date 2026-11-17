@@ -77,7 +77,7 @@ namespace VulkanDeviceManager {
 		};
 
 		VK_CHECK(vkCreateDevice(VulkanPhysicalDeviceManager::gPhysicalDevice, &createInfo, nullptr, &gDevice));
-		vkGetDeviceQueue(gDevice, VulkanPhysicalDeviceManager::gGraphicsQueueFamilyIndex, 0, &gGraphicsQueue);
+		vkGetDeviceQueue(gDevice, VulkanPhysicalDeviceManager::gGraphicsQueueFamilyIndex, gQUEUE_INDEX, &gGraphicsQueue);
 	}
 
 	void Clean() {

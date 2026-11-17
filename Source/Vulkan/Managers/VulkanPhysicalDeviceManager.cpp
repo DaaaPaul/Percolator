@@ -4,6 +4,7 @@
 #include <sstream>
 #include "VulkanPhysicalDeviceManager.h"
 #include "VulkanInstanceManager.h"
+#include "VulkanSurfaceManager.h"
 #include "Utility/CommonInclude.h"
 
 namespace VulkanPhysicalDeviceManager {
@@ -11,6 +12,27 @@ namespace VulkanPhysicalDeviceManager {
 	VkPhysicalDeviceLimits gPhysicalDeviceLimits{};
 	uint32_t gGraphicsQueueFamilyIndex = UINT32_MAX;
 	VkPhysicalDeviceProperties gPhysicalDeviceProperties{};
+
+	void PrintInfo() {
+		if(gPhysicalDevice == VK_NULL_HANDLE) {
+			assert(false && "PrintInfo: gPhysicalDevice == VK_NULL_HANDLE");
+		}
+
+		std::ostringstream info;
+		info << std::boolalpha << std::fixed << std::setprecision(2);
+		info << "========== Vulkan GPU ==========\n"
+			 << "Name: " << gPhysicalDeviceProperties.deviceName << '\n'
+			 << "Type: " << vk::to_string(static_cast<vk::PhysicalDeviceType>(gPhysicalDeviceProperties.deviceType)) << '\n'
+			 << "Vendor ID: 0x" << std::hex << gPhysicalDeviceProperties.vendorID
+			 << " | Device ID: 0x" << gPhysicalDeviceProperties.deviceID << std::dec << '\n'
+			 << "Vulkan API: " << VK_API_VERSION_MAJOR(gPhysicalDeviceProperties.apiVersion) << '.'
+			 << VK_API_VERSION_MINOR(gPhysicalDeviceProperties.apiVersion) << '.' << VK_API_VERSION_PATCH(gPhysicalDeviceProperties.apiVersion)
+			 << " (variant " << VK_API_VERSION_VARIANT(gPhysicalDeviceProperties.apiVersion) << ")\n"
+			 // Driver version encoding is vendor-specific.
+			 << "Driver version (raw): 0x" << std::hex << gPhysicalDeviceProperties.driverVersion << std::dec << '\n';
+
+		std::cout << info.str();
+	}
 
 	void Init() {
 		uint32_t physicalDeviceCount{};
@@ -101,10 +123,17 @@ namespace VulkanPhysicalDeviceManager {
 
 			bool foundAllQueueFamilies = false;
 
-			for(VkQueueFamilyProperties familyProperties : queueFamilyProperties) {
-				if(familyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-					foundAllQueueFamilies = true;
-					break;
+			for(int i = 0; i < queueFamilyCount; ++i) {
+				if(queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+					VkBool32 supportsPresent{};
+					VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(option, i, VulkanSurfaceManager::gSurface, &supportsPresent))
+					
+					if(supportsPresent) {
+						foundAllQueueFamilies = true;
+						gGraphicsQueueFamilyIndex = i;
+
+						break;
+					}
 				}
 			}
 
@@ -121,18 +150,6 @@ namespace VulkanPhysicalDeviceManager {
 				vkGetPhysicalDeviceProperties(option, &gPhysicalDeviceProperties);
 				gPhysicalDeviceLimits = gPhysicalDeviceProperties.limits;
 
-				uint32_t queueFamilyCount{};
-				vkGetPhysicalDeviceQueueFamilyProperties(option, &queueFamilyCount, nullptr);
-				std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyCount);
-				vkGetPhysicalDeviceQueueFamilyProperties(option, &queueFamilyCount, queueFamilyProperties.data());
-
-				for(int i = 0; i < queueFamilyProperties.size(); ++i) {
-					if(queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-						gGraphicsQueueFamilyIndex = i;
-						break;
-					}
-				}
-
 				PrintInfo();
 
 				break;
@@ -142,26 +159,5 @@ namespace VulkanPhysicalDeviceManager {
 		if(gPhysicalDevice == VK_NULL_HANDLE) {
 			assert(false && "Did not find valid physical device");
 		}
-	}
-
-	void PrintInfo() {
-		if(gPhysicalDevice == VK_NULL_HANDLE) {
-			assert(false && "PrintInfo: gPhysicalDevice == VK_NULL_HANDLE");
-		}
-
-		std::ostringstream info;
-		info << std::boolalpha << std::fixed << std::setprecision(2);
-		info << "========== Vulkan GPU ==========\n"
-			 << "Name: " << gPhysicalDeviceProperties.deviceName << '\n'
-			 << "Type: " << vk::to_string(static_cast<vk::PhysicalDeviceType>(gPhysicalDeviceProperties.deviceType)) << '\n'
-			 << "Vendor ID: 0x" << std::hex << gPhysicalDeviceProperties.vendorID
-			 << " | Device ID: 0x" << gPhysicalDeviceProperties.deviceID << std::dec << '\n'
-			 << "Vulkan API: " << VK_API_VERSION_MAJOR(gPhysicalDeviceProperties.apiVersion) << '.'
-			 << VK_API_VERSION_MINOR(gPhysicalDeviceProperties.apiVersion) << '.' << VK_API_VERSION_PATCH(gPhysicalDeviceProperties.apiVersion)
-			 << " (variant " << VK_API_VERSION_VARIANT(gPhysicalDeviceProperties.apiVersion) << ")\n"
-			 // Driver version encoding is vendor-specific.
-			 << "Driver version (raw): 0x" << std::hex << gPhysicalDeviceProperties.driverVersion << std::dec << '\n';
-
-		std::cout << info.str();
 	}
 }
