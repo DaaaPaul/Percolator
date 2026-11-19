@@ -21,6 +21,13 @@ add_executable(Percolator)
 set(PERCOLATOR_SOURCE
     Source/main.cpp
 
+	Source/Gui/Gui.cpp
+	Source/Gui/Gui.h
+	Source/Gui/Backend/GuiDescriptorPool.cpp
+	Source/Gui/Backend/GuiDescriptorPool.h
+	Source/Gui/Backend/GuiCommandBuffer.cpp
+	Source/Gui/Backend/GuiCommandBuffer.h
+
 	Source/Vulkan/Managers/VulkanInstanceManager.cpp
 	Source/Vulkan/Managers/VulkanInstanceManager.h
 	Source/Vulkan/Managers/VulkanSurfaceManager.cpp
