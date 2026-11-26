@@ -5,6 +5,7 @@
 #include "Vulkan/Managers/VulkanPhysicalDeviceManager.h"
 #include "Vulkan/Managers/VulkanDeviceManager.h"
 #include "Vulkan/Managers/VulkanSwapchainManager.h"
+#include "Gui/Backend/GuiDescriptorPool.h"
 
 int main() {
     GlfwWindowManager::InitCalled initGlfwWindowCalled = GlfwWindowManager::Init();
@@ -13,6 +14,10 @@ int main() {
 	VulkanPhysicalDeviceManager::Init();
 	VulkanDeviceManager::Init();
 	VulkanSwapchainManager::Init();
+
+	GuiDescriptorPool::Init();
+
+	GuiDescriptorPool::Clean();
 
 	VulkanSwapchainManager::Clean();
 	VulkanDeviceManager::Clean();
