@@ -86,7 +86,7 @@ namespace VulkanInstanceManager {
 
 		constexpr VkApplicationInfo APP_INFO{
 			.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-			.apiVersion = VK_API_VERSION_1_3
+			.apiVersion = gVK_API_VERSION
 		};
 		const VkInstanceCreateInfo CREATE_INFO{
 			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,

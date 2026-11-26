@@ -50,7 +50,7 @@ namespace VulkanPhysicalDeviceManager {
 			VkPhysicalDeviceProperties properties{};
 			vkGetPhysicalDeviceProperties(option, &properties);
 
-			if(properties.apiVersion >= VK_API_VERSION_1_3) {
+			if(properties.apiVersion >= VulkanInstanceManager::gVK_API_VERSION) {
 				apiVersionEnough = true;
 			}
 

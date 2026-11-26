@@ -19,6 +19,22 @@ endif()
 add_executable(Percolator)
 
 set(PERCOLATOR_SOURCE
+	Vendor/ImGUI/imconfig.h
+	Vendor/ImGUI/imgui.h
+	Vendor/ImGUI/imgui_internal.h
+	Vendor/ImGUI/imstb_rectpack.h
+	Vendor/ImGUI/imstb_textedit.h
+	Vendor/ImGUI/imstb_truetype.h
+	Vendor/ImGUI/imgui.cpp
+	Vendor/ImGUI/imgui_demo.cpp
+	Vendor/ImGUI/imgui_draw.cpp
+	Vendor/ImGUI/imgui_tables.cpp
+	Vendor/ImGUI/imgui_widgets.cpp
+	Vendor/ImGUI/imgui_impl_glfw.h
+	Vendor/ImGUI/imgui_impl_glfw.cpp
+	Vendor/ImGUI/imgui_impl_vulkan.h
+	Vendor/ImGUI/imgui_impl_vulkan.cpp
+
     Source/main.cpp
 
 	Source/Gui/Gui.cpp
@@ -64,6 +80,7 @@ target_link_libraries(Percolator PRIVATE
 target_include_directories(Percolator PRIVATE
     ${GLFW3_INCLUDE_DIR}
 	Source
+	Vendor
 )
 
 set(ADDRESS_SANITIZER OFF)
