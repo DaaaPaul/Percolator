@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 
 namespace GuiDescriptorPool {
-	extern VkDescriptorPool descriptorPool;
+	extern VkDescriptorPool gDescriptorPool;
 
 	void Init();
 	void Clean();

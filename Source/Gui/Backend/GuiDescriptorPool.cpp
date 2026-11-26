@@ -5,7 +5,7 @@
 #include "Vulkan/Managers/VulkanDeviceManager.h"
 
 namespace GuiDescriptorPool {
-	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+	VkDescriptorPool gDescriptorPool = VK_NULL_HANDLE;
 
 	void Init() {
 		constexpr uint32_t SET_NUM = 1000;
@@ -34,10 +34,10 @@ namespace GuiDescriptorPool {
 			.pPoolSizes = poolSizes.data()
 		};
 
-		VK_CHECK(vkCreateDescriptorPool(gDevice, &descriptorPoolCreate, nullptr, &descriptorPool))
+		VK_CHECK(vkCreateDescriptorPool(gDevice, &descriptorPoolCreate, nullptr, &gDescriptorPool))
 	}
 
 	void Clean() {
-		vkDestroyDescriptorPool(gDevice, descriptorPool, nullptr);
+		vkDestroyDescriptorPool(gDevice, gDescriptorPool, nullptr);
 	}
 }
